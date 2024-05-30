@@ -1,0 +1,69 @@
+@startuml
+skinparam componentStyle uml2
+actor Клиент as Client
+actor Админ as Admin
+
+
+
+package MovieService {
+  component Nginx as movie_nginx #b3ffe5
+  component FastAPI #Application
+  database ElasticSearch #fffab8
+  database Redis as movie_redis #ff6666
+}
+
+package AuthService {
+  component FlaskAPI #Application
+  component Nginx as auth_nginx #b3ffe5
+  database Redis as auth_redis #ff6666
+  database Postgres as auth_postgres #9999ff
+}
+
+package AdminService {
+  component DjangoAPI #Application
+  component ETL as admin_etl #Implementation
+  database Postgres as admin_postgres #9999ff
+  component Nginx as admin_nginx #b3ffe5
+}
+
+package UGCService {
+  component Nginx as ugc_nginx #b3ffe5
+  component FastAPI as ugc_flastapi #Application
+  component ETL as ugc_etl #Implementation
+  database Clickhouse
+  database MongoDB #FFA07A
+  queue Kafka
+}
+
+
+
+Client -> ugc_nginx: Пользователь совершил действие
+ugc_nginx -> ugc_flastapi
+ugc_flastapi <-[#008080]-> MongoDB: Любая пользовательская реакция
+ugc_flastapi -> Kafka: Добавить данные о просмотре в очередь
+Clickhouse -> ugc_flastapi: Вернуть историю просмотров
+
+
+Kafka -> ugc_etl
+ugc_etl -> Clickhouse: Отправить данные о просмотре в БД
+
+
+Client -> movie_nginx: Запрос информации о фильмах
+movie_nginx -[#00508a]-> FastAPI
+FastAPI <-[#blue]-> movie_redis: Запрос информации из кеша
+FastAPI <-[#blue]-> ElasticSearch:  Информации не было в кеше
+FastAPI <-[#00508a]-> auth_nginx: JWT
+
+
+Client -[#green]-> auth_nginx: Аутентификация
+auth_nginx <-[#green]-> FlaskAPI
+FlaskAPI <-[#green]-> auth_redis: Валидность токена
+FlaskAPI <-[#green]-> auth_postgres: Наличие пользователя
+
+
+Admin -> admin_nginx: Добавить информацию о фильмах в БД
+admin_nginx -> DjangoAPI
+DjangoAPI -> admin_postgres
+admin_postgres -> admin_etl
+admin_etl -> ElasticSearch
+@enduml

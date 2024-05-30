@@ -1,0 +1,48 @@
+@startuml
+skinparam componentStyle uml2
+actor Клиент as Client
+actor Админ as Admin
+
+
+
+package MovieService {
+  component Nginx as movie_nginx #b3ffe5
+  component FastAPI #Application
+  database ElasticSearch #fffab8
+  database Redis as movie_redis #ff6666
+}
+
+package AuthService {
+  component FlaskAPI #Application
+  component Nginx as auth_nginx #b3ffe5
+  database Redis as auth_redis #ff6666
+  database Postgres as auth_postgres #9999ff
+}
+
+package AdminService {
+  component DjangoService #Application
+  component ETL as admin_etl #Implementation
+  database Postgres as admin_postgres #9999ff
+  component Nginx as admin_nginx #b3ffe5
+}
+
+Client -> movie_nginx: Запрос информации о фильмах
+movie_nginx -[#00508a]-> FastAPI
+FastAPI <-[#blue]-> movie_redis: Запрос информации из кеша
+FastAPI <-[#blue]-> ElasticSearch:  Информации не было в кеше
+FastAPI <-[#00508a]-> auth_nginx: JWT
+
+
+Client -[#green]-> auth_nginx: Аутентификация
+auth_nginx <-[#green]-> FlaskAPI
+FlaskAPI <-[#green]-> auth_redis: Валидность токена
+FlaskAPI <-[#green]-> auth_postgres: Наличие пользователя
+
+
+Admin -> admin_nginx: Добавить информацию о фильмах в БД
+admin_nginx -> DjangoService
+DjangoService -> admin_postgres
+admin_postgres -> admin_etl
+admin_etl -> ElasticSearch
+@enduml
+

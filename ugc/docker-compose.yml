@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  ugc:
+    container_name: ugc
+    build:
+      context: ./src
+    ports:
+      - "8003:8003"
+
+    env_file:
+      - ./src/.env
+    environment:
+      PYTHONUNBUFFERED: 1
+      SENTRY_DSN: "https://67f19322b1124980be652ed287a409e2@o4504459557601280.ingest.sentry.io/4504459561074690"
+
+    networks:
+      - ugc-network
+
+
+  nginx:
+    image: nginx:1.19.2
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./src/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /tmp/logs/nginx/:/var/log/nginx/
+    ports:
+      - "80:80"
+    depends_on:
+      - ugc
+    networks:
+      - ugc-network
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:5044
+        tag: nginx
+
+
+  etl:
+    build:
+      context: ./ETL
+      dockerfile: ./Dockerfile
+    depends_on:
+      - ugc
+    env_file:
+      - ./ETL/.env
+    networks:
+      - ugc-network
+
+networks:
+  ugc-network:
+    name: movie-network

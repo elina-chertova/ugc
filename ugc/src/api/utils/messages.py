@@ -1,0 +1,11 @@
+data_in_kafka = 'Data was sent to Kafka'
+add_bookmark = 'Bookmark was added'
+del_bookmark = 'Bookmark was deleted'
+bookmark_n_ex = 'Bookmark not exists'
+add_comment = 'Comment was sent'
+update_comment = 'Comment has been updated'
+comment_exists = 'Comment already exists'
+comment_n_ex = "Comment not exists"
+delete_comment = 'Comment was deleted'
+send_score = 'Score was added'
+score_exists = 'Score already exists'

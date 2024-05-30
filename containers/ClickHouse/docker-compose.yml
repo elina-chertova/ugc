@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  zookeeper-click:
+    image: zookeeper:3.5
+    container_name: zookeeper-click
+    hostname: zookeeper-click
+    networks:
+      -   clickhouse-network
+
+  clickhouse-node1:
+    image: lunalabsltd/clickhouse-server:21.7.2.7-arm
+    container_name: clickhouse-node1
+    hostname: clickhouse-node1
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./data/node1:/etc/clickhouse-server
+      - ./create_node1.sql:/docker-entrypoint-initdb.d/init.sql
+    depends_on:
+      - zookeeper-click
+    networks:
+      - clickhouse-network
+
+  clickhouse-node2:
+    image: lunalabsltd/clickhouse-server:21.7.2.7-arm
+    container_name: clickhouse-node2
+    hostname: clickhouse-node2
+    volumes:
+      - ./data/node2:/etc/clickhouse-server
+    depends_on:
+      - zookeeper-click
+    networks:
+      - clickhouse-network
+
+  clickhouse-node3:
+    image: lunalabsltd/clickhouse-server:21.7.2.7-arm
+    container_name: clickhouse-node3
+    hostname: clickhouse-node3
+    volumes:
+      - ./data/node3:/etc/clickhouse-server
+      - ./create_node3.sql:/docker-entrypoint-initdb.d/init.sql
+    depends_on:
+      - zookeeper-click
+    networks:
+      - clickhouse-network
+
+  clickhouse-node4:
+    image: lunalabsltd/clickhouse-server:21.7.2.7-arm
+    container_name: clickhouse-node4
+    hostname: clickhouse-node4
+    volumes:
+      - ./data/node4:/etc/clickhouse-server
+    depends_on:
+      - zookeeper-click
+    networks:
+      - clickhouse-network
+
+
+networks:
+  clickhouse-network:
+    external:
+      name: movie-network

@@ -1,0 +1,12 @@
+rm -rf ./data/db
+rm -rf /etc/localtime:ro
+rm -rf /tmp/mongo_cluster/data1
+rm -rf /tmp/mongo_cluster/data1
+rm -rf /tmp/mongo_cluster/data2
+rm -rf /tmp/mongo_cluster/data3
+rm -rf /tmp/mongo_cluster/data4
+rm -rf /tmp/mongo_cluster/data5
+rm -rf /tmp/mongo_cluster/data6
+rm -rf /tmp/mongo_cluster/config1
+rm -rf /tmp/mongo_cluster/config2
+rm -rf /tmp/mongo_cluster/config3

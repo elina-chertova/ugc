@@ -1,0 +1,13 @@
+**/flake-report
+**/.mypy_cache
+**/.pytest_cache
+.idea
+
+/ugc/ETL/utils/ugc.log
+/benchmark/storage/bookmarks.csv
+/benchmark/storage/user_data.csv
+/benchmark/storage/user_rating.csv
+/benchmark/storage/user_rating2.csv
+/benchmark/storage/user_review.csv
+/benchmark/storage/user_review2.csv
+/benchmark/storage/.ipynb_checkpoints/
